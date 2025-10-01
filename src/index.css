@@ -70,6 +70,10 @@ body {
   width: 200px;
 }
 
+.main-nav-icon{
+  margin-right: 10px;
+}
+
 .hero {
   background-image: url('../img/bank-tree.jpeg');
   background-position: 0 -50px;
