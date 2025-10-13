@@ -1,16 +1,21 @@
 import { useState } from "react"
+import { useSelector, useDispatch } from "react-redux"
+import { updateUserName } from "../store/authSlice" // Action
+import { updateUserProfile } from "../services/api" // Fonction API
+
 
 export default function Profile() {
 
     const [isEditing, setIsEditing] = useState(false)
-    const [userName, setUserName] = useState('Tony')
     const [newUserName, setNewUserName] = useState('')
 
-    // Données temporaires (plus tard, elles viendront de Redux)
-    const user = {
-        firstName: 'Tony',
-        lastName: 'Stark'
-    };
+    // Recupére les données depuis Redux
+    const dispatch = useDispatch()
+    const { user, token } = useSelector((state) => state.auth)
+
+    if (!user) {
+        return <div>Loading...</div>
+    }
 
     const accounts = [
         {
@@ -34,16 +39,26 @@ export default function Profile() {
     ];
 
     const handleEditClick = () => {
-        setNewUserName(userName)
+        setNewUserName(user.userName)
         setIsEditing(true)
     }
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault()
-        setUserName(newUserName)
-        setIsEditing(false)
-        console.log(`Nouveau Username: ${newUserName}`);      
-        // Plus tard, on enverra à l'API via Redux  
+        try {
+            // Appelle l'API pour mettre à jour le username
+            await updateUserProfile(token, newUserName)
+
+            // Met à jour Redux
+            dispatch(updateUserName(newUserName))
+
+            setIsEditing(false)
+            console.log(`Nouveau username : ${newUserName}`)
+            
+        } catch (error) {
+            console.error("Error updating username: ", error)
+            alert("Failed to update username")            
+        } 
     }
 
     const handleCancel = () => {
@@ -56,71 +71,74 @@ export default function Profile() {
     <main className="main bg-dark">
         <div className="header">
             {!isEditing ? (
-                    <>
-                        <h1>Welcome back <br /> {userName} {user.lastName} </h1>
+                <>
+                    <h1>Welcome back <br /> {user.firstName} {user.userName} {user.lastName}
+                    </h1>
+                    
+                    <button 
+                        className="edit-button"
+                        onClick={handleEditClick}
+                    >
+                        Edit name
+                    </button>
+                </>
+            ) : (
+                <>
+                    <h1>Edit user info</h1>
+                    <form onSubmit={handleSave}>
                         
-                        <button 
-                            className="edit-button"
-                            onClick={handleEditClick}
-                        >
-                            Edit name
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <h1>Edit user info</h1>
-                        <form onSubmit={handleSave}>
+                        {/* USERNAME */}
+                        <div className="edit-input-wrapper">
+                            <label htmlFor="username">User name: </label>
+                            <input 
+                                type="text"
+                                id="username" 
+                                value={newUserName} 
+                                onChange={(e) => setNewUserName(e.target.value)}   
+                            />
+                        </div>
+
+                        {/* FIRST NAME */}
+                        <div className="edit-input-wrapper">
+                            <label htmlFor="firstName">First name: </label>
+                            <input 
+                                type="text"
+                                id="firstName" 
+                                value={user.firstName} 
+                                disabled  
+                            />
+                        </div>
+
+                        {/* LAST NAME */}
+                        <div className="edit-input-wrapper">
+                            <label htmlFor="lastName">Last name: </label>
+                            <input 
+                                type="text"
+                                id="lastName" 
+                                value={user.lastName} 
+                                disabled  
+                            />
+                        </div>
+
+                        {/* EDIT BUTTON */}
+                        <div className="edit-buttons">
+                            <button 
+                                type="submit" 
+                                className="edit-button"
+                            > 
+                                Save                                    
+                            </button>
                             
-                            {/* USERNAME */}
-                            <div className="edit-input-wrapper">
-                                <label htmlFor="username">User name: </label>
-                                <input 
-                                    type="text"
-                                    id="username" 
-                                    value={newUserName} 
-                                    onChange={(e) => setNewUserName(e.target.value)}   
-                                />
-                            </div>
+                            <button 
+                                className="edit-button"
+                                onClick={handleCancel}
+                            > 
+                                Cancel                                    
+                            </button>
+                        </div>
 
-                            {/* FIRST NAME */}
-                            <div className="edit-input-wrapper">
-                                <label htmlFor="firstName">First name: </label>
-                                <input 
-                                    type="text"
-                                    id="firstName" 
-                                    value={user.firstName} 
-                                    disabled  
-                                />
-                            </div>
-
-                            {/* LAST NAME */}
-                            <div className="edit-input-wrapper">
-                                <label htmlFor="lastName">Last name: </label>
-                                <input 
-                                    type="text"
-                                    id="lastName" 
-                                    value={user.lastName} 
-                                    disabled  
-                                />
-                            </div>
-
-                            {/* EDIT BUTTON */}
-                            <div className="edit-buttons">
-                                <button 
-                                    type="submit" 
-                                    className="edit-button"
-                                > Save                                    
-                                </button>
-                                
-                                <button 
-                                    className="edit-button"
-                                    onClick={handleCancel}
-                                > Cancel                                    
-                                </button>
-                            </div>
-
-                        </form>
-                    </>
+                    </form>
+                </>
                 )
             }
         </div>
