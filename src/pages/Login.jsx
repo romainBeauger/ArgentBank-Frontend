@@ -1,17 +1,50 @@
 import { useState } from "react"
-// import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import { loginStart, loginSuccess, loginFailure, setUser } from "../store/authSlice"
+import { loginUser, getUserProfile } from "../services/api"
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [rememberMe, setRememberMe] = useState(false)
-    // const navigate = useNavigate()
 
-    const handleSubmit = (e) => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    // Recupère l'état depuis Redux
+    const { loading, error } = useSelector((state) => state.auth)
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(`Email: ${email}`);
-        console.log(`Password: ${password}`);
-        console.log(`RememberMe: ${rememberMe}`);        
+        // console.log(`Email: ${email}`);
+        // console.log(`Password: ${password}`);
+        // console.log(`RememberMe: ${rememberMe}`);  
+        
+        
+         // Commence le login
+         dispatch(loginStart())
+
+        try {
+            // 1. Appelle l'API pour se connecter
+            const token = await loginUser(email, password)
+
+            // 2. Stocke le token dans Redux
+            dispatch(loginSuccess({ token }))
+
+            // 3. Récupère les infos utilisateur 
+            const userData = await getUserProfile(token)
+
+            // 4. Stocke les infos utilisateur dans Redux
+            dispatch(setUser(userData))
+
+            // 5. Redirige vers la page Profile
+            navigate ('/profile')
+            
+        } catch (error) {
+            // En cas d'erreur, stocke le message d'erreur
+            dispatch(loginFailure(error.message))
+        }
     }
 
   return (
@@ -20,6 +53,13 @@ export default function Login() {
         <section className="sign-in-content">
             <i className="fa fa-user-circle sign-in-icon"></i>
             <h1>Sign In</h1>
+
+            {/* Afficher message d'erreur si il existe */}
+            {error && (
+                <div className="errorSignIn"> 
+                    {error}
+                </div>
+            )}
 
             <form onSubmit= {handleSubmit} >
 
@@ -32,6 +72,7 @@ export default function Login() {
                         value= {email}
                         onChange={(e) => setEmail(e.target.value)} 
                         autoComplete="username"
+                        required
                     />
                 </div>
 
@@ -44,6 +85,7 @@ export default function Login() {
                         value= {password}
                         onChange={(e) => setPassword(e.target.value)} 
                         autoComplete="current-password"
+                        required
                     />
                 </div>
 
@@ -60,12 +102,17 @@ export default function Login() {
                 </div>
                 
                 {/* BOUTON SUBMIT */}
-                <button type="submit" className="sign-in-button">Sign In</button>
+                {/* Désactive le bouton pendant le chargement */}
+                <button 
+                    type="submit" 
+                    className="sign-in-button"                    
+                    disabled={loading}                
+                >
+                    Sign In
+                </button>
 
             </form>
-
         </section>
     </main>
-
   )
 }

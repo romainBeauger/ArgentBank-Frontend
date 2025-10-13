@@ -295,6 +295,11 @@ html, body {
   color: #fff;
 }
 
+.errorSignIn {
+  color: red;
+  margin-bottom: 1rem;
+}
+
 @media (min-width: 720px) {
   .account {
     flex-direction: row;
