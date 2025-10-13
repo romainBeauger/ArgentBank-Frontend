@@ -13,38 +13,39 @@ export default function Login() {
     const dispatch = useDispatch()
 
     // Recupère l'état depuis Redux
-    const { loading, error, isAuthenticated } = useSelector((state) => state.auth)
+    const { loading, error, isAuthenticated } = useSelector((state) => state.auth)    
 
     // Si déjà connecté redirige vers /profile
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/profile')
-        }
-    }, [isAuthenticated, navigate])
+    if (isAuthenticated) {
+      navigate('/profile');
+    }
+  }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        // console.log(`Email: ${email}`);
-        // console.log(`Password: ${password}`);
-        // console.log(`RememberMe: ${rememberMe}`);          
-        
+        e.preventDefault()       
          // Commence le login
          dispatch(loginStart())
 
         try {
-            // 1. Appelle l'API pour se connecter
+            // Appelle l'API pour se connecter
             const token = await loginUser(email, password)
 
-            // 2. Stocke le token dans Redux
+            // Si "Remember me" est coché, sauvegarde le token
+            if (rememberMe) {
+                localStorage.setItem('token', token);
+            }
+
+            // Stocke le token dans Redux
             dispatch(loginSuccess({ token }))
 
-            // 3. Récupère les infos utilisateur 
+            // Récupère les infos utilisateur 
             const userData = await getUserProfile(token)
 
-            // 4. Stocke les infos utilisateur dans Redux
+            // Stocke les infos utilisateur dans Redux
             dispatch(setUser(userData))
 
-            // 5. Redirige vers la page Profile
+            // Redirige vers la page Profile
             navigate ('/profile')
             
         } catch (error) {

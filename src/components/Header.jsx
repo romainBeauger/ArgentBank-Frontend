@@ -16,6 +16,8 @@ export default function Header() {
 
   // Fonction pour se déconnecter
   const handleLogout = () => {
+     // Supprime le token du localStorage
+     localStorage.removeItem('token')     
     dispatch(logout())
     navigate('/')
   }
