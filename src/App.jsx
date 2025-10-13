@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
+import PrivateRoute from './components/PrivateRoute';
 
 
 function App() {
@@ -16,7 +17,17 @@ function App() {
        <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<Profile />} />
+
+        {/* Protège la route Profile avec le composant PrivateRoute*/}
+        <Route 
+          path="/profile" 
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          } 
+        />
+
       </Routes>
       <Footer />
     </BrowserRouter>

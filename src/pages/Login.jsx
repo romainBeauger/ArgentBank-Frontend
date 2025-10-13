@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { loginStart, loginSuccess, loginFailure, setUser } from "../store/authSlice"
@@ -13,14 +13,20 @@ export default function Login() {
     const dispatch = useDispatch()
 
     // Recupère l'état depuis Redux
-    const { loading, error } = useSelector((state) => state.auth)
+    const { loading, error, isAuthenticated } = useSelector((state) => state.auth)
+
+    // Si déjà connecté redirige vers /profile
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/profile')
+        }
+    }, [isAuthenticated, navigate])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         // console.log(`Email: ${email}`);
         // console.log(`Password: ${password}`);
-        // console.log(`RememberMe: ${rememberMe}`);  
-        
+        // console.log(`RememberMe: ${rememberMe}`);          
         
          // Commence le login
          dispatch(loginStart())
