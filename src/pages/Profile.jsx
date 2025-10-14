@@ -152,8 +152,8 @@ export default function Profile() {
                 <p className="account-amount"> {account.amount} </p>
                 <p className="account-amount-description"> {account.description} </p>
             </div>
-            <div className="account-content-wrapper cta">
-                <button className="transaction-button">View transactions</button>
+            <div className="account-arrow">
+                <i className="fa fa-chevron-right"></i>
             </div>
           </section>  
         ))}

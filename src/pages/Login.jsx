@@ -59,7 +59,7 @@ export default function Login() {
     <main className="main bg-dark">
         <section className="sign-in-content">
             <i className="fa fa-user-circle sign-in-icon"></i>
-            <h1>Sign In</h1>
+            <h1 className="sign-in-text">Sign In</h1>
 
             {/* Afficher message d'erreur si il existe */}
             {error && (

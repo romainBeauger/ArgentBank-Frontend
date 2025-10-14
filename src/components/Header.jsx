@@ -35,30 +35,37 @@ export default function Header() {
       </Link>
       <div>
         {isAuthenticated ? (
-          <>
+          <div className="header-icon-wrapper">
              {/* Si connecté : affiche le prénom + Sign Out */}
             <Link 
               className="main-nav-item" 
               to="/profile"
             >
-              <i className="fa fa-user-circle main-nav-icon"></i>
-              {user?.firstName}
+              <div className="profile-wrapper">
+                <span className="userName">{user?.userName || user?.firstName}</span>
+                <i className="fa-solid fa-user-circle fa-2xl"></i>
+              </div>
             </Link>
 
+            <div className="gear">
+              <i className="fa-solid fa-gear fa-2xl"></i>
+            </div>
+
+            {/* Logout */}
             <Link 
               className="main-nav-item" 
               to="/"
               onClick={handleLogout}
             >
-              <i className="main-nav-icon fa fa-sign-out"></i>
-                Sign Out
+              <span className="sign-out"><i className="fa-solid fa-power-off fa-2xl"></i></span>
             </Link>
-          </>
+          </div>
         ) : (
           // Si déconnecté : affiche Sign In 
-          <Link className="main-nav-item" to="/login">
-            <i className="main-nav-icon fa fa-user-circle"></i>
-              Sign in
+          <Link className="header-sign-in-button" to="/login">
+              <div 
+              className="sign-in-icon-header"><i className="fa fa-user-circle main-nav-icon fa-2xl"></i></div>
+                <span className="sign-in-text">Sign In</span>
           </Link>
         )}
       </div>
